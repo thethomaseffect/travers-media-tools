@@ -1,4 +1,4 @@
-travers-media-tools
+Travers Media Tools
 ===================
 
-A scalable server-based media transcoding tool utilizing FFMPEG and Python
+A server-based avconv encoder that lets users upload and transcode media files remotely.
