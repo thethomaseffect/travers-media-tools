@@ -1,6 +1,6 @@
 """Does a thing"""
 import threading
-from MediaObject import MediaObject
+from media_object import MediaObject
 import re
 import pexpect
 

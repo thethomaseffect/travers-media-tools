@@ -1,5 +1,5 @@
 """ Main Method to demonstrate Encoder easily"""
-from Encoders import Encoder
+from encoders import Encoder
 import time
 
 PATH_TO_QUEUE = '/home/thomas/encodeQueue/'
