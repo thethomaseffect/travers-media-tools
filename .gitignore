@@ -19,6 +19,9 @@ lib
 lib64
 __pycache__
 
+# Old Code
+__depreciated
+
 # Installer logs
 pip-log.txt
 
