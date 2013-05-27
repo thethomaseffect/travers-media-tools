@@ -1,0 +1,349 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Travers Media Tools by thethomaseffect</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/thethomaseffect/travers-media-tools">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/thethomaseffect/travers-media-tools/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/thethomaseffect/travers-media-tools/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Travers Media Tools</h1>
+          <p>A avconv-based media transcoder for the cloud that scales horizontally.</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/thethomaseffect">thethomaseffect</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>Travers Media Encoder</h1>
+
+<h2>Outline</h2>
+
+<p>Travers Media Encoder is a cloud-based video and audio encoder that allows a user to convert media from one format to another over the web, with the actual transcoding being done on a server and then letting them download the result. Thanks to filepicker.io, the user can upload files from their own cloud storage service such as Dropbox without having the file locally. It is written in Python and uses the Django framework, libav encoding tools, SQLite and runs on linux.</p>
+
+<ul>
+<li><a href="http://www.youtube.com/watch?v=UMhja2z2y34">Video Demonstration</a></li>
+<li><a href="https://github.com/thethomaseffect/travers-media-tools">Source Code</a></li>
+</ul><h2>Demo Video</h2>
+
+<p>In the video, the application is running locally on port 8000. The integration with filepicker.io is demonstrated by using a dropbox file not on the local machine. When the user hits the "Upload and Transcode" button, the file is uploaded to the application server. Then, it is transcoded and when complete, the page will refresh with a download link to where the file is being statically served from. We can observe the differences between the input and output by using avprobe, a media information tool included with libav. Lastly, we view the video and confirm it indeed works.</p>
+
+<h4>Input</h4>
+
+<pre><code>avprobe version 0.8.6-6:0.8.6-1ubuntu2, Copyright (c) 2007-2013 the Libav developers
+  built on Mar 30 2013 22:20:06 with gcc 4.7.2
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'input_small.mp4':
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 0
+    compatible_brands: mp42isomavc1
+    creation_time   : 2010-03-20 21:29:11
+    encoder         : HandBrake 0.9.4 2009112300
+  Duration: 00:00:05.56, start: 0.000000, bitrate: 551 kb/s
+    Stream #0.0(und): Video: h264 (Constrained Baseline), yuv420p, 560x320, 465 kb/s, 30 fps, 30 tbr, 90k tbn, 60 tbc
+    Metadata:
+      creation_time   : 2010-03-20 21:29:11
+    Stream #0.1(eng): Audio: aac, 48000 Hz, mono, s16, 83 kb/s
+    Metadata:
+      creation_time   : 2010-03-20 21:29:11
+</code></pre>
+
+<h4>Output</h4>
+
+<pre><code>avprobe version 0.8.6-6:0.8.6-1ubuntu2, Copyright (c) 2007-2013 the Libav developers
+  built on Mar 30 2013 22:20:06 with gcc 4.7.2
+[matroska,webm @ 0x1429b20] Estimating duration from bitrate, this may be inaccurate
+Input #0, matroska,webm, from 'input_small.mp4_transcoded.mkv':
+  Metadata:
+    MAJOR_BRAND     : mp42
+    MINOR_VERSION   : 0
+    COMPATIBLE_BRANDS: mp42isomavc1
+    CREATION_TIME   : 2010-03-20 21:29:11
+    ENCODER         : Lavf53.21.1
+  Duration: 00:00:05.56, start: 0.000000, bitrate: N/A
+    Stream #0.0(und): Video: mpeg4 (Simple Profile), yuv420p, 560x320 [PAR 1:1 DAR 7:4], 30 fps, 30 tbr, 1k tbn, 30 tbc (default)
+    Metadata:
+      CREATION_TIME   : 2010-03-20 21:29:11
+      LANGUAGE        : und
+    Stream #0.1(eng): Audio: vorbis, 48000 Hz, mono, s16 (default)
+    Metadata:
+      CREATION_TIME   : 2010-03-20 21:29:11
+      LANGUAGE        : eng
+</code></pre>
+
+<p>The audio, video and container formats are all different in the output file, and as seen in the demo the output plays just as well as the input, but now uses completely free codecs.</p>
+
+<h2>Challenges</h2>
+
+<p>I decided to do this project mainly because I wanted to seriously challenge myself. For that reason, I decided to learn the Python programming language, the Django framework and the libav encoding tools. I have a keen interest in scalability so I planned for the application to horizontally scale with ease from the beginning. I researched many solutions for this and found celery combined with redis message queue to be the optimal solution.</p>
+
+<p>However, I quickly found that I didn't have the resources needed to confirm if the software could run on multiple machines, so I didn't actually implement distributed asynchronous messaging but kept it in mind so it would be easy to do if needed (in fact, it would only be about 5 lines of code).</p>
+
+<p>My main challenge was the fact the encoding was much more difficult that I anticipated. The optimal settings used for each codec is equivalent to 2n^2, because the settings to encode from a =&gt; b are not the same as b =&gt; a. Note that this is an optimistic estimate since more seasoned encoders will want fine-grained control over each bitrate. Because of this, my demonstration is optimized for converting .mp4 files to .mkv as writing out endless settings files was not the reason I pursued this project.</p>
+
+<p>Learning a new programming language and then working inside a huge, mature framework written in it was no easy task. I started off learning with reading through the entire official python tutorial and most of the documentation related to collections, then watched all of Google Code's video lectures. I am always anxious to write idiomatic code so I read over the pep8 style guidelines many times to make sure my python code looked like python code.</p>
+
+<p>One of the biggest problems I faced during development was parsing the console output of the avconv subprocess. The problem here is that python's build-in subprocess module sees a new line character as the signal to return that line to the program. However, once encoding starts avconv continuously write to the same line and the output cannot be read until encoding is finished. One of my goals was to include a progress bar during encoding and if I could not consume the current output this could not be done.</p>
+
+<p>After a lot of frustration and research I managed to achieve my goal using a third-party library called pexpect. pexpect is designed for controlling subprocesses rather than just executing them and it allowed me to parse the line of text that subprocess would not.</p>
+
+<h2>Development Environment</h2>
+
+<p>I developed the application on Ubuntu linux using Sublime Text 2 for my text editor. I used an application called virtualenv, which allows isolated python installations so package version dependencies do not collide at an OS level. This is recommended practice for any project of sufficient complexity. While writing the application, I rigorously tested the code using python's built-in test runner and used pylint to provide static analysis which made up for the lack on an IDE. For package management I used pip, which provides easy downloads of packages in PyPy, the python package database. For version control, I used git on github since I intended for the application to be open-source from the beginning.</p>
+
+<h2>Installation</h2>
+
+<p>This assumes you are running on ubuntu linux machine with python already installed. First we install our dependencies using the command-line.</p>
+
+<pre lang="shell"><code>sudo apt-get install git pip libav
+</code></pre>
+
+<p>git will allow us to download the code from github. pip is a python package manager that'll let us easily install our third-party libraries and libav is the encoding tools used for the actual conversion.</p>
+
+<p>Next we prepare a directory to download the code to and clone the git repository.</p>
+
+<pre lang="shell"><code>mkdir git-repos
+cd git-repos/
+git clone https://github.com/thethomaseffect/travers-media-tools.git
+</code></pre>
+
+<p>Now we install the required python libraries (the web framework is one of them!)</p>
+
+<pre lang="shell"><code>pip install pexpect django
+</code></pre>
+
+<p>Lastly, your own filepicker.io API key must be added to /encoder/settings.py. For now, I've left mine there so you shouldn't need to do anything, but I'll very likely remove it in the near future. If in doubt, check the git commit history.</p>
+
+<h2>Running</h2>
+
+<p>Now we're ready to go! We'll build the database and run the test server! If you're prompted to create a superuser/admin type 'no' and hit return.</p>
+
+<pre lang="shell"><code>cd git-repos/travers-media-tools/encoder/
+python manage.py syncdb
+python manage.py runserver
+</code></pre>
+
+<p>if you're already running something on port 8000, just add a space and a new port number after runserver.</p>
+
+<p>If everything was done right, the server should now be running and available on localhost:8000. Open your web browser, go to the address and upload a media file. I can only guarantee that the included input_small.mkv will work correctly, though many more should work. After hitting upload and waiting a while the page will refresh and you should be able download your new file. congrats!</p>
+
+<h2>Interesting Code Snippets</h2>
+
+<h3>Calculating the percentage of encoding complete</h3>
+
+<div class="highlight"><pre>    <span class="k">def</span> <span class="nf">get_time_elapsed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Returns a int between 0 and 100 representing the percentage</span>
+<span class="sd">        of encoding currently completed.</span>
+<span class="sd">        """</span>
+        <span class="n">time_elapsed_regex</span> <span class="o">=</span> <span class="s">".*?time=([+-]?</span><span class="se">\\</span><span class="s">d*</span><span class="se">\\</span><span class="s">.</span><span class="se">\\</span><span class="s">d+)(?![-+0-9</span><span class="se">\\</span><span class="s">.])"</span>
+        <span class="n">regex_group</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">time_elapsed_regex</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">alive</span><span class="p">():</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">subprocess_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_thread</span><span class="o">.</span><span class="n">subprocess_output</span>
+        <span class="n">percentage_elapsed</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">media_object</span><span class="o">.</span><span class="n">media_duration</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">subprocess_output</span><span class="p">:</span>
+            <span class="n">regex_match</span> <span class="o">=</span> <span class="n">regex_group</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">subprocess_output</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">regex_match</span><span class="p">:</span>
+                <span class="c"># INFO: In Python 3.x round returns an int so the cast to float</span>
+                <span class="c"># can safely be removed</span>
+                <span class="n">current_percentage</span> <span class="o">=</span> <span class="n">percentage_elapsed</span><span class="p">(</span>
+                    <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">regex_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))))</span>
+                <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">current_percentage</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+</pre></div>
+
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">get_media_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">"""</span>
+<span class="sd">    Spawns an avprobe process to get the media duration.</span>
+
+<span class="sd">    Spawns an avprobe process and saves the output to a list, then uses</span>
+<span class="sd">    regex to find the duration of the media and return it as an integer.</span>
+<span class="sd">    """</span>
+    <span class="n">subprocess_command</span> <span class="o">=</span> <span class="s">"/usr/bin/avprobe "</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_filename</span>
+    <span class="n">info_process</span> <span class="o">=</span> <span class="n">pexpect</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">subprocess_command</span><span class="p">)</span>
+    <span class="n">subprocess_output</span> <span class="o">=</span> <span class="n">info_process</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="n">info_process</span><span class="o">.</span><span class="n">close</span>
+
+    <span class="n">duration_regex</span> <span class="o">=</span> <span class="s">".*?Duration: .*?(</span><span class="se">\\</span><span class="s">d+):(</span><span class="se">\\</span><span class="s">d+):(</span><span class="se">\\</span><span class="s">d+).(</span><span class="se">\\</span><span class="s">d+)"</span>
+    <span class="n">regex_group</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">duration_regex</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">round_milliseconds</span><span class="p">(</span><span class="n">milliseconds</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">milliseconds</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">subprocess_output</span><span class="p">:</span>
+        <span class="n">regex_match</span> <span class="o">=</span> <span class="n">regex_group</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">regex_match</span><span class="p">:</span>
+            <span class="c"># Return the total duration in seconds</span>
+            <span class="k">return</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">regex_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="mi">3600</span><span class="p">)</span> <span class="o">+</span>
+                    <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">regex_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span> <span class="o">+</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">regex_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">+</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">round_milliseconds</span><span class="p">(</span><span class="n">regex_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">4</span><span class="p">))))</span>
+    <span class="c"># Not found so it's possible the process terminated early or an update</span>
+    <span class="c"># broke the regex. Unlikely but we must return something just in case.</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+</pre></div>
+
+<p>Note that this demonstrates Python's nested functions. round_milliseconds is only viable in the scope of the get_media_duration function. percentage_elapsed uses a lambda anonymous function which provides exactly the same functionality but is more suited to one-line expressions.</p>
+
+<h3>Encoder Thread</h3>
+
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">EncodingThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
+
+    <span class="sd">"""Do a thing"""</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">media_object</span><span class="p">):</span>
+        <span class="sd">"""Does a thing"""</span>
+        <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">media_object</span> <span class="o">=</span> <span class="n">media_object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subprocess_output</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">"""Does a thing"""</span>
+        <span class="c"># Some sensible defaults, such as overwriting if destination already</span>
+        <span class="c"># exists</span>
+        <span class="n">subprocess_command</span> <span class="o">=</span> <span class="s">"/usr/bin/avconv -i "</span> <span class="o">+</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">media_object</span><span class="o">.</span><span class="n">input_filename</span> <span class="o">+</span> <span class="s">" -y "</span> <span class="o">+</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">media_object</span><span class="o">.</span><span class="n">output_filename</span>
+        <span class="n">encoding_process</span> <span class="o">=</span> <span class="n">pexpect</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">subprocess_command</span><span class="p">)</span>
+        <span class="k">print</span> <span class="p">(</span><span class="s">"Started </span><span class="si">%s</span><span class="s">"</span> <span class="o">%</span> <span class="n">subprocess_command</span><span class="p">)</span>
+        <span class="n">compiled_regex_list</span> <span class="o">=</span> \
+            <span class="n">encoding_process</span><span class="o">.</span><span class="n">compile_pattern_list</span><span class="p">([</span><span class="n">pexpect</span><span class="o">.</span><span class="n">EOF</span><span class="p">,</span> <span class="s">'(.+)'</span><span class="p">])</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">encoding_process</span><span class="o">.</span><span class="n">expect_list</span><span class="p">(</span><span class="n">compiled_regex_list</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c"># EOF</span>
+                <span class="k">print</span> <span class="p">(</span><span class="s">"</span><span class="si">%s</span><span class="s"> Process Finished"</span> <span class="o">%</span> <span class="n">subprocess_command</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">output_line</span> <span class="o">=</span> <span class="n">encoding_process</span><span class="o">.</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+                <span class="c"># Check the index of the first occurrence of frame=</span>
+                <span class="c"># Sadly this varies so we must also check 0</span>
+                <span class="k">if</span> <span class="n">output_line</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">"frame="</span><span class="p">)</span> <span class="ow">is</span> <span class="mi">7</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">subprocess_output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_line</span><span class="p">)</span>
+        <span class="n">encoding_process</span><span class="o">.</span><span class="n">close</span>
+</pre></div>
+
+<p>This demonstrates how object-orientated python looks, and also the correct way thread classes should be written (ie. only one method - run()). Anywhere the self keyword can be found there's likely to be some OO at work. Interestingly, despite encouraging an imperative style, everything in python is an object. This can easily be shown with the following code in the python interpreter:</p>
+
+<div class="highlight"><pre><span class="n">number</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="nb">dir</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+</pre></div>
+
+<p>This will print all of number's methods, proving it is an object.</p>
+
+<p>The above code also shows how pexpect works. There's plenty of regular expressions too for those who are fans!</p>
+
+<h3>Serving static files through Django</h3>
+
+<div class="highlight"><pre><span class="n">MEDIA_DOWNLOADS_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="s">'media/finished/'</span><span class="p">)</span>
+<span class="c"># ...</span>
+<span class="c"># Serves files from domain/downloads/</span>
+<span class="p">(</span><span class="s">r'^downloads/(?P&lt;path&gt;.*)$'</span><span class="p">,</span> <span class="s">'django.views.static.serve'</span><span class="p">,</span>
+    <span class="p">{</span><span class="s">'document_root'</span><span class="p">:</span> <span class="n">MEDIA_DOWNLOADS_ROOT</span><span class="p">}),</span>
+</pre></div>
+
+<p>For production environments, something like apache would be more suited to this task but for testing it's very convenient!</p>
+
+<h3>Running POST requests on the server</h3>
+
+<div class="highlight"><pre><span class="k">def</span> <span class="nf">home</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">"POST"</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">"POST parameters: "</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span>
+        <span class="k">print</span> <span class="s">"Files: "</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">FILES</span>
+
+        <span class="c"># Build the form</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">UploadModelForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="c"># Read the data and upload it to the location defined in UploadModel</span>
+            <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+            <span class="c"># Save the name of the uploaded file</span>
+            <span class="n">uploaded_filename</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s">'filepicker_file'</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+
+            <span class="c"># Build the full input path to the file</span>
+            <span class="n">MEDIA_UPLOAD_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="s">'media/uploads/'</span><span class="p">)</span>
+            <span class="n">input_path</span> <span class="o">=</span> <span class="n">MEDIA_UPLOAD_ROOT</span> <span class="o">+</span> <span class="n">uploaded_filename</span>
+
+            <span class="c"># Build the output filename</span>
+            <span class="n">output_filename</span> <span class="o">=</span> <span class="n">uploaded_filename</span> <span class="o">+</span> <span class="s">"_transcoded.mkv"</span>
+
+            <span class="c"># Build the output path</span>
+            <span class="n">MEDIA_DOWNLOADS_ROOT</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="s">'media/finished/'</span><span class="p">)</span>
+            <span class="n">output_path</span> <span class="o">=</span> <span class="n">MEDIA_DOWNLOADS_ROOT</span> <span class="o">+</span> <span class="n">output_filename</span>
+
+            <span class="c"># Transcode the file</span>
+            <span class="n">video_encoder</span> <span class="o">=</span> <span class="n">Encoder</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">output_path</span><span class="p">)</span>
+            <span class="n">video_encoder</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="k">while</span> <span class="n">video_encoder</span><span class="o">.</span><span class="n">alive</span><span class="p">():</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">video_encoder</span><span class="o">.</span><span class="n">get_time_elapsed</span><span class="p">())</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+
+            <span class="c"># Return the path to the file</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="n">output_filename</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">UploadModelForm</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">"home.html"</span><span class="p">,</span> <span class="p">{</span><span class="s">'form'</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s">'message'</span><span class="p">:</span> <span class="n">message</span><span class="p">})</span>
+</pre></div>
+
+<p>This is the code that processes the request, encodes the video and returns the info needed to generate the download link. To demonstrate the percentage function works it prints to the console, but in a production version of the application an AJAX function on the client-side would request this instead to update a progress bar. As Javascript, JQuery, AJAX and CSS were outside the scope of my project I didn't implement this, but it could be done very quickly.</p>
+
+<h3>File Upload Database Model</h3>
+
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
+<span class="kn">import</span> <span class="nn">django_filepicker</span>
+
+
+<span class="k">class</span> <span class="nc">UploadModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c"># FPFileField renders as a filepicker dragdrop widget, but when accessed will</span>
+    <span class="c"># provide a File-like interface.</span>
+    <span class="n">filepicker_file</span> <span class="o">=</span> <span class="n">django_filepicker</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">FPFileField</span><span class="p">(</span><span class="n">upload_to</span><span class="o">=</span><span class="s">'uploads'</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">UploadModelForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">UploadModel</span>
+</pre></div>
+
+<p>This is the code that is used to automatically generate what's required in the database to allow the use of filepicker.io for uploads.</p>
+
+<h2>Final Thoughts</h2>
+
+<p>I really enjoyed doing this project and learned a lot. I'd like to continue working on it as an open-source project as there is a real gap in the market for a product like this. The only people offering a similar service are charging for it so it has potential to grow as a free open-source software project. I think if possible I would wrap a C++ API instead of console output and compile my own version of libav so that the application is less sensitive to regex-breaking updates.</p>
+
+<p>Learning a modern scripting language like python is very valuable and I've found it my go-to language whenever I want to quickly demonstrate some idea or algorithm. Thanks to implementations such as IronPython I've been able use it together with C# to enhance software such as games where scripting is highly valuable yet performance is critical.</p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
