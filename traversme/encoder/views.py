@@ -31,6 +31,9 @@ def home(request):
 
             # Build the output path
             MEDIA_DOWNLOADS_ROOT = os.path.join(os.getcwd(),'media/finished/')
+            # If the output folder doesn't exist, create it
+            if not os.path.exists(MEDIA_DOWNLOADS_ROOT):
+                os.makedirs(MEDIA_DOWNLOADS_ROOT)
             output_path = MEDIA_DOWNLOADS_ROOT + output_filename
 
             # Transcode the file
