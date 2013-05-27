@@ -1,3 +1,5 @@
 django
 django-celery
+django-filepicker
+django-bootstrap
 pexpect
