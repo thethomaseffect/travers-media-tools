@@ -33,9 +33,6 @@ nosetests.xml
 # Database
 db.sql
 
-# Uploads
-media
-
 # Mr Developer
 .mr.developer.cfg
 .project
