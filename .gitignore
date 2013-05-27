@@ -33,10 +33,6 @@ nosetests.xml
 # Database
 db.sql
 
-# Media Files
-*.mkv
-*.mp4
-
 # Mr Developer
 .mr.developer.cfg
 .project
