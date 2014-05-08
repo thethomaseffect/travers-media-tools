@@ -28,7 +28,7 @@ DATABASES = {
 }
 
 #Your Filepicker.io API key goes here. To get an api key, go to https://filepicker.io
-FILEPICKER_API_KEY = 'AFUcokElBRCuVP8Vd1L2ez'
+FILEPICKER_API_KEY = ''
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
