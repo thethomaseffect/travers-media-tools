@@ -1,6 +1,7 @@
 """Does a thing"""
+from __future__ import print_function
 import threading
-from media_object import MediaObject
+from traversme.encoder.media_object import MediaObject
 import re
 import pexpect
 
@@ -97,7 +98,7 @@ class EncodingThread(threading.Thread):
                 break
             else:
                 output_line = encoding_process.match.group(0).rstrip()
-                # Check the index of the first occurance of frame=
+                # Check the index of the first occurrence of frame=
                 # Sadly this varies so we must also check 0
                 if output_line.find("frame=") is 7 or 0:
                     self.subprocess_output.append(output_line)
