@@ -20,26 +20,27 @@ class MediaObject(object):
         Spawns an avprobe process and saves the output to a list, then uses
         regex to find the duration of the media and return it as an integer.
         """
-        subprocess_command = "/usr/bin/avprobe " + self.input_filename
-        info_process = pexpect.spawn(subprocess_command)
+
+        info_process = pexpect.spawn("/usr/bin/avprobe " + self.input_filename)
         subprocess_output = info_process.readlines()
         info_process.close
         # Non-greedy match on characters 'Duration: ' followed by
         # number in form 00:00:00:00
-        duration_regex = ".*?Duration: .*?(\\d+):(\\d+):(\\d+).(\\d+)"
-        regex_group = re.compile(duration_regex, re.IGNORECASE | re.DOTALL)
-
-        round_milliseconds = lambda milliseconds: 1 \
-            if int(milliseconds) > 50 else 0
-
+        regex_group = re.compile(".*?Duration: .*?(\\d+):(\\d+):(\\d+).(\\d+)",
+                                 re.IGNORECASE | re.DOTALL)
+        # Exits as soon as duration is found
+        # PERF: Perform some tests to find the min number of lines
+        # certain not to contain the duration, then operate on a slice
+        # not containing those lines
         for line in subprocess_output:
             regex_match = regex_group.search(line)
             if regex_match:
                 # Return the total duration in seconds
-                return ((int(regex_match.group(1)) * 3600) +
-                        (int(regex_match.group(2)) * 60) +
-                        int(regex_match.group(3)) +
-                        int(round_milliseconds(regex_match.group(4))))
+                return ((int(regex_match.group(1)) * 3600) +  # Hours
+                        (int(regex_match.group(2)) * 60) +    # Minutes
+                        int(regex_match.group(3)) +           # Seconds
+                        # Round milliseconds to nearest second
+                        1 if int(regex_match.group(3)) > 50 else 0)
         # Not found so it's possible the process terminated early or an update
         # broke the regex. Unlikely but we must return something just in case.
         return -1
