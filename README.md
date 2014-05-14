@@ -15,7 +15,7 @@ Installation
 This assumes you are running on ubuntu linux machine with python already installed. First we install our dependencies using the command-line.
 
 ```shell
-sudo apt-get install git pip libav
+sudo apt-get install git python-pip libav-tools
 ```
 
 git will allow us to download the code from github. pip is a python package manager that'll let us easily install our third-party libraries and libav is the encoding tools used for the actual conversion.
@@ -34,7 +34,7 @@ Now we install the required python libraries (the web framework is one of them!)
 pip install pexpect django
 ```
 
-Lastly, your own filepicker.io API key must be added to /encoder/settings.py. For now, I've left mine there so you shouldn't need to do anything, but I'll very likely remove it in the near future. If in doubt, check the git commit history.
+Lastly, your own filepicker.io API key must be added to /encoder/settings.py
 
 
 Running
