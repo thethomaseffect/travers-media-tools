@@ -1,5 +1,6 @@
 """Does a thing"""
-from __future__ import print_function
+from __future__ import print_function  # Stops Pylint warnings
+from future.builtins import *  # Use Python 3 behaviors
 import threading
 from traversme.encoder.media_object import MediaObject
 import re
@@ -52,6 +53,8 @@ class AvconvProcess(object):
         Returns a int between 0 and 100 representing the percentage
         of encoding currently completed.
         """
+        # TODO: Once code builds and works replace regex with
+        # .*?time=(\\d+\\.\\d+)
         time_elapsed_regex = ".*?time=([+-]?\\d*\\.\\d+)(?![-+0-9\\.])"
         regex_group = re.compile(time_elapsed_regex, re.DOTALL)
         if not self.alive():

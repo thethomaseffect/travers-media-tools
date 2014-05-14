@@ -23,7 +23,8 @@ class MediaObject(object):
         info_process = pexpect.spawn(subprocess_command)
         subprocess_output = info_process.readlines()
         info_process.close
-
+        # Non-greedy match on characters 'Duration: ' followed by
+        # number in form 00:00:00:00
         duration_regex = ".*?Duration: .*?(\\d+):(\\d+):(\\d+).(\\d+)"
         regex_group = re.compile(duration_regex, re.IGNORECASE | re.DOTALL)
 
