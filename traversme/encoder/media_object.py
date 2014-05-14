@@ -1,3 +1,4 @@
+""" TODO: Add docstring """
 import re
 import pexpect
 
@@ -28,8 +29,8 @@ class MediaObject(object):
         duration_regex = ".*?Duration: .*?(\\d+):(\\d+):(\\d+).(\\d+)"
         regex_group = re.compile(duration_regex, re.IGNORECASE | re.DOTALL)
 
-        def round_milliseconds(milliseconds):
-            return round(float(milliseconds) / 100)
+        round_milliseconds = lambda milliseconds: 1 \
+            if int(milliseconds) > 50 else 0
 
         for line in subprocess_output:
             regex_match = regex_group.search(line)
